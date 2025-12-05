@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>北海道五星雪祭之旅</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Babel (for JSX) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fffbf0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Smooth Scrolling */
+        html { scroll-behavior: smooth; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.344.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useRef } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+            Plane, MapPin, Mountain, Footprints, Utensils, 
+            BedDouble, Fish, ShoppingBag, Gift, Moon, 
+            Landmark, TreePine, PawPrint, Lightbulb, Camera, 
+            Coffee, Music, Bus, UtensilsCrossed, Navigation, 
+            ArrowRight, Phone, Building2, Ticket, Cloud, 
+            Sun, CloudRain, Snowflake, Clock, CalendarDays, 
+            Info as InfoIcon, ShoppingBasket, Wallet, Plus, X, 
+            Trash2, Check, Image as ImageIcon, Upload, StickyNote,
+            Calendar, CreditCard, Banknote, MoreHorizontal, 
+            RefreshCcw, Calculator, Settings
+        } from 'lucide-react';
+
+        // --- TYPES & CONSTANTS ---
+        
+        const TRIP_DATA = {
+            title: "北海道燈節百萬美元五稜星5日",
+            duration: "2025/12/23 - 2025/12/27",
+            flights: [
+                {
+                    date: "2025/12/23",
+                    flightNo: "IT260",
+                    airline: "台灣虎航",
+                    from: "高雄 (KHH)",
+                    to: "新千歲 (CTS)",
+                    depTime: "08:00",
+                    arrTime: "12:55"
+                },
+                {
+                    date: "2025/12/27",
+                    flightNo: "IT261",
+                    airline: "台灣虎航",
+                    from: "新千歲 (CTS)",
+                    to: "高雄 (KHH)",
+                    depTime: "13:55",
+                    arrTime: "18:05"
+                }
+            ],
+            contacts: [
+                {
+                    role: "領隊/導遊",
+                    name: "邱良泰",
+                    phoneTW: "0932819110",
+                    phoneJP: "81-090-8779-3933"
+                }
+            ],
+            hotels: [
+                { date: "12/23", name: "登別萬世閣 (Noboribetsu Manseikaku)", tel: "81-143-84-3500" },
+                { date: "12/24", name: "函館 IMAGINE & RESORT", tel: "81-138-57-9161" },
+                { date: "12/25", name: "洞爺湖畔亭飯店 (Toya Kohan Tei)", tel: "81-142-75-2211" },
+                { date: "12/26", name: "HOTEL IBIS STYLES 札幌", tel: "81-11-530-4055" }
+            ],
+            itinerary: [
+                {
+                    date: "12/23",
+                    dayOfWeek: "週二",
+                    title: "DAY 1 高雄 ✈ 新千歲 ➝ 登別",
+                    items: [
+                        { id: "d1-1", time: "05:30", title: "集合報到", description: "高雄小港機場國際航站3樓虎航櫃台", category: "other", location: "高雄小港機場國際航站", icon: "MapPin" },
+                        { id: "d1-2", time: "08:00", title: "搭乘 IT260 飛往北海道", description: "抵達時間 12:55。", category: "flight", location: "新千歲機場", icon: "Plane" },
+                        { id: "d1-lunch", title: "午餐：壽司餐盒＋茶飲", description: "車上享用美味壽司便當，欣賞沿途雪景。", category: "food", location: "專車上", icon: "Utensils" },
+                        { id: "d1-3", title: "登別地獄谷", description: "北海道遺產，直徑450公尺的火山口遺跡，煙霧繚繞如地獄景象。", category: "sightseeing", location: "登別地獄谷", icon: "Mountain" },
+                        { id: "d1-4", title: "登別溫泉街", description: "極樂通商店街、閻王變臉秀。日本十大溫泉之一，硫化水素泉。", category: "sightseeing", location: "登別溫泉通", icon: "Footprints" },
+                        { id: "d1-5", title: "晚餐：飯店內總匯自助餐", description: "入住登別萬世閣。", category: "food", location: "登別萬世閣", icon: "Utensils" }
+                    ]
+                },
+                {
+                    date: "12/24",
+                    dayOfWeek: "週三",
+                    title: "DAY 2 尼克斯海洋公園 ➝ 函館夜景",
+                    items: [
+                        { id: "d2-1", title: "尼克斯海洋公園", description: "北歐風海洋城堡。必看：企鵝遊行、海豚海獅秀、銀河水槽。", category: "sightseeing", location: "登別尼克斯海洋公園", icon: "Fish" },
+                        { id: "d2-lunch", title: "午餐：日式壽喜燒吃到飽", description: "享用熱騰騰的壽喜燒鍋物，肉品無限供應。", category: "food", location: "餐廳", icon: "Utensils" },
+                        { id: "d2-2a", title: "金森紅磚倉庫群", description: "明治時代港口倉庫改建的購物區，有各式雜貨與甜點。", category: "shopping", location: "金森紅磚倉庫", icon: "ShoppingBag" },
+                        { id: "d2-2b", title: "函館聖誕嘉年華", description: "欣賞巨大聖誕樹與港灣的霓虹彩燈節。", category: "sightseeing", location: "金森紅磚倉庫群前", icon: "Lightbulb" },
+                        { id: "d2-3", title: "贈送：Pastry Snaffle’s 起司蛋糕", description: "函館超人氣甜點，口感綿密。", category: "food", location: "金森洋物館", note: "若遇缺貨改贈等值甜點", icon: "Gift" },
+                        { id: "d2-4", title: "函館山百萬夜景", description: "搭乘纜車上下山，欣賞世界三大夜景之一的扇形海灣夜景。", category: "sightseeing", location: "函館山纜車", note: "若纜車停駛則改搭巴士，並退費處理", icon: "Moon" },
+                        { id: "d2-5", title: "入住：函館 IMAGINE & RESORT", description: "晚餐：飯店內總匯自助餐。", category: "lodging", location: "函館 IMAGINE & RESORT", icon: "Hotel" }
+                    ]
+                },
+                {
+                    date: "12/25",
+                    dayOfWeek: "週四",
+                    title: "DAY 3 函館朝市 ➝ 洞爺湖",
+                    items: [
+                        { id: "d3-1", title: "函館朝市", description: "發放代金日幣 1500，可自由品嚐海膽、牡丹蝦或水果。", category: "food", location: "函館朝市", icon: "Utensils" },
+                        { id: "d3-2", title: "五稜郭公園", description: "日本第一座西洋式星形城堡 (不上展望塔)。", category: "sightseeing", location: "五稜郭公園", icon: "Landmark" },
+                        { id: "d3-3", title: "大沼國定公園", description: "日本新三景之一，駒岳山下的美麗火山湖。", category: "sightseeing", location: "大沼國定公園", icon: "TreePine" },
+                        { id: "d3-lunch", title: "午餐：鮭ちゃんちゃん燒", description: "北海道名物：鮭魚味噌鐵板燒 (石狩鍋風味)。", category: "food", location: "大沼/昭和新山周邊", icon: "Utensils" },
+                        { id: "d3-4", title: "昭和新山熊牧場", description: "贈送熊餅乾或蘋果體驗餵食樂趣。", category: "sightseeing", location: "昭和新山熊牧場", icon: "PawPrint" },
+                        { id: "d3-5", title: "洞爺湖冬季夢幻隧道", description: "40萬顆燈泡組成的光之隧道 (自由前往)。", category: "sightseeing", location: "洞爺湖汽船本社前", icon: "Lightbulb" },
+                        { id: "d3-6", title: "入住：洞爺湖畔亭飯店", description: "晚餐：飯店內自助餐。", category: "lodging", location: "洞爺湖畔亭", icon: "Hotel" }
+                    ]
+                },
+                {
+                    date: "12/26",
+                    dayOfWeek: "週五",
+                    title: "DAY 4 小樽運河 ➝ 札幌市區",
+                    items: [
+                        { id: "d4-1", title: "SAIRO 展望台", description: "眺望洞爺湖全景的最佳地點。", category: "sightseeing", location: "筒倉展望台", icon: "Mountain" },
+                        { id: "d4-lunch", title: "午餐：豪華三大蟹+日式涮涮鍋", description: "帝王蟹、松葉蟹、毛蟹吃到飽 + 軟飲無限暢飲。", category: "food", location: "名水亭/小樽周邊", icon: "UtensilsCrossed" },
+                        { id: "d4-2", title: "小樽運河", description: "浪漫的紅色磚瓦倉庫群與運河風情。", category: "sightseeing", location: "小樽運河", icon: "Camera" },
+                        { id: "d4-3", title: "銀之鐘咖啡館", description: "贈送 Hello Kitty 咖啡杯 + 暢飲熱飲 + 小甜點。", category: "food", location: "小樽 銀之鐘一號館", icon: "Coffee" },
+                        { id: "d4-4", title: "小樽音樂盒堂 & 北一硝子館", description: "參觀百年蒸氣時鐘，欣賞精緻玻璃工藝。", category: "shopping", location: "小樽音樂盒堂 本館", icon: "Music" },
+                        { id: "d4-5", title: "贈送：不思議大泡芙", description: "北菓樓名產，外酥內爆漿。", category: "food", location: "北菓樓 小樽本館", icon: "Gift" },
+                        { id: "d4-6a", title: "大通公園 (白色燈樹節)", description: "札幌著名的冬季點燈活動，璀璨浪漫。", category: "sightseeing", location: "札幌大通公園", icon: "Lightbulb" },
+                        { id: "d4-6b", title: "狸小路商店街", description: "北海道最大的商店街，藥妝、伴手禮一應俱全 (含慕尼黑聖誕市集)。", category: "shopping", location: "狸小路商店街", icon: "ShoppingBag" },
+                        { id: "d4-7", title: "晚餐：方便逛街，敬請自理", description: "建議於狸小路或薄野區享用湯咖哩或拉麵。", category: "food", location: "狸小路/薄野", icon: "Utensils" },
+                        { id: "d4-8", title: "入住：HOTEL IBIS STYLES 札幌", category: "lodging", location: "ibis Styles Sapporo", icon: "Hotel" }
+                    ]
+                },
+                {
+                    date: "12/27",
+                    dayOfWeek: "週六",
+                    title: "DAY 5 札幌 ✈ 高雄",
+                    items: [
+                        { id: "d5-1", title: "市區巡禮 (車窗觀光)", description: "途經舊道廳 (紅磚廳舍) 與 時計台。", category: "sightseeing", location: "北海道廳舊本廳舍", icon: "Bus" },
+                        { id: "d5-2", title: "北海道神宮", description: "北海道唯一的神宮，供奉歷代天皇及開拓功臣。", category: "sightseeing", location: "北海道神宮", icon: "Landmark" },
+                        { id: "d5-3a", title: "前往新千歲機場", description: "準備搭機返台。", category: "transport", location: "新千歲機場", icon: "Bus" },
+                        { id: "d5-3b", title: "機場免稅店最後採買", description: "購買白色戀人、薯條三兄弟等北海道限定伴手禮。", category: "shopping", location: "新千歲機場國內線航廈", icon: "ShoppingBag" },
+                        { id: "d5-4", time: "13:55", title: "搭乘 IT261 返台", description: "午餐：機上餐食 + 起司魚板點心。 18:05 抵達高雄。", category: "flight", location: "新千歲機場", icon: "Plane" }
+                    ]
+                }
+            ]
+        };
+
+        const THEMES = [
+            { name: 'orange', main: 'bg-orange-500', text: 'text-orange-600', light: 'bg-orange-50', border: 'border-orange-200', shadow: 'shadow-orange-200', line: 'bg-orange-200' },
+            { name: 'rose',   main: 'bg-rose-500',   text: 'text-rose-600',   light: 'bg-rose-50',   border: 'border-rose-200',   shadow: 'shadow-rose-200',   line: 'bg-rose-200' },
+            { name: 'amber',  main: 'bg-amber-500',  text: 'text-amber-600',  light: 'bg-amber-50',  border: 'border-amber-200',  shadow: 'shadow-amber-200',  line: 'bg-amber-200' },
+            { name: 'red',    main: 'bg-red-500',    text: 'text-red-600',    light: 'bg-red-50',    border: 'border-red-200',    shadow: 'shadow-red-200',    line: 'bg-red-200' },
+            { name: 'stone',  main: 'bg-stone-500',  text: 'text-stone-600',  light: 'bg-stone-50',  border: 'border-stone-200',  shadow: 'shadow-stone-200',  line: 'bg-stone-200' },
+        ];
+
+        // --- COMPONENT: ITINERARY ---
+        const Itinerary = ({ data }) => {
+            const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+            const currentDay = data.itinerary[selectedDayIndex];
+            const currentTheme = THEMES[selectedDayIndex % THEMES.length];
+
+            const handleNavigate = (item) => {
+                const query = encodeURIComponent(item.location || item.title);
+                const url = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
+                window.open(url, '_blank');
+            };
+
+            const getIcon = (iconName) => {
+                switch (iconName) {
+                    case 'Plane': return <Plane className="w-5 h-5" />;
+                    case 'MapPin': return <MapPin className="w-5 h-5" />;
+                    case 'Mountain': return <Mountain className="w-5 h-5" />;
+                    case 'Footprints': return <Footprints className="w-5 h-5" />;
+                    case 'Utensils': return <Utensils className="w-5 h-5" />;
+                    case 'Hotel': return <BedDouble className="w-5 h-5" />;
+                    case 'Fish': return <Fish className="w-5 h-5" />;
+                    case 'ShoppingBag': return <ShoppingBag className="w-5 h-5" />;
+                    case 'Gift': return <Gift className="w-5 h-5" />;
+                    case 'Moon': return <Moon className="w-5 h-5" />;
+                    case 'Landmark': return <Landmark className="w-5 h-5" />;
+                    case 'TreePine': return <TreePine className="w-5 h-5" />;
+                    case 'PawPrint': return <PawPrint className="w-5 h-5" />;
+                    case 'Lightbulb': return <Lightbulb className="w-5 h-5" />;
+                    case 'Camera': return <Camera className="w-5 h-5" />;
+                    case 'Coffee': return <Coffee className="w-5 h-5" />;
+                    case 'Music': return <Music className="w-5 h-5" />;
+                    case 'Bus': return <Bus className="w-5 h-5" />;
+                    case 'UtensilsCrossed': return <UtensilsCrossed className="w-5 h-5" />;
+                    default: return <MapPin className="w-5 h-5" />;
+                }
+            };
+
+            const routeSummary = Array.from(new Set(
+                currentDay.items
+                .filter(item => item.category !== 'other' && item.category !== 'food' && item.location)
+                .map(item => item.location.replace(/機場|飯店|Hotel/g, '').trim())
+            )).filter(Boolean).slice(0, 4);
+
+            return (
+                <div className={`pb-24 min-h-full ${currentTheme.light} transition-colors duration-500`}>
+                    {/* Date Selector */}
+                    <div className="sticky top-0 bg-[#fffbf0]/95 backdrop-blur-sm z-20 shadow-sm border-b border-orange-100">
+                        <div className="flex w-full px-2 py-3 gap-2">
+                        {data.itinerary.map((day, index) => {
+                            const theme = THEMES[index % THEMES.length];
+                            const isSelected = selectedDayIndex === index;
+                            return (
+                                <button
+                                    key={day.date}
+                                    onClick={() => setSelectedDayIndex(index)}
+                                    className={`flex-1 min-w-0 flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all duration-300 border ${
+                                    isSelected
+                                        ? `${theme.main} text-white shadow-lg ${theme.shadow} transform scale-[1.02] border-transparent`
+                                        : `bg-white text-stone-400 border-orange-100 hover:border-orange-200`
+                                    }`}
+                                >
+                                    <span className={`text-[10px] font-bold tracking-wider mb-0.5 ${isSelected ? 'text-white/90' : 'text-stone-400'}`}>
+                                    DAY {index + 1}
+                                    </span>
+                                    <span className={`text-sm font-black truncate w-full text-center ${isSelected ? 'text-white' : 'text-stone-600'}`}>
+                                    {day.date}
+                                    </span>
+                                    <span className={`text-[10px] ${isSelected ? 'text-white/90' : 'text-stone-400'}`}>
+                                    {day.dayOfWeek}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                        </div>
+                    </div>
+
+                    <div className="px-5 py-6">
+                        <div className="mb-6 animate-in slide-in-from-left-2 duration-300" key={`title-${selectedDayIndex}`}>
+                            <h2 className={`text-2xl font-black ${currentTheme.text} mb-1`}>
+                                {currentDay.title.split(' ')[0]} {currentDay.title.split(' ')[1]}
+                            </h2>
+                            <p className="text-stone-500 text-sm font-medium mb-3">
+                                {currentDay.title.split(' ').slice(2).join(' ')}
+                            </p>
+                            {routeSummary.length > 0 && (
+                                <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-stone-600 bg-white/60 p-2 rounded-lg border border-orange-100/50">
+                                    <MapPin className="w-3.5 h-3.5 text-orange-400" />
+                                    {routeSummary.map((loc, idx) => (
+                                        <React.Fragment key={idx}>
+                                            <span>{loc}</span>
+                                            {idx < routeSummary.length - 1 && <ArrowRight className="w-3 h-3 text-stone-300" />}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-6 relative">
+                            <div className={`absolute left-[19px] top-4 bottom-4 w-0.5 ${currentTheme.line} z-0 transition-colors duration-500`}></div>
+                            {currentDay.items.map((item, idx) => {
+                                const isShopping = item.category === 'shopping';
+                                return (
+                                    <div key={item.id} className="relative z-10 flex gap-4 animate-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
+                                        <div onClick={() => handleNavigate(item)} className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-4 border-white shadow-sm transition-transform hover:scale-110 cursor-pointer ${
+                                            item.category === 'flight' ? 'bg-sky-100 text-sky-600' :
+                                            item.category === 'food' ? 'bg-orange-100 text-orange-600' :
+                                            item.category === 'lodging' ? 'bg-indigo-100 text-indigo-600' :
+                                            isShopping ? 'bg-pink-100 text-pink-600' : 
+                                            'bg-emerald-100 text-emerald-600'
+                                        }`}>
+                                            {getIcon(item.icon)}
+                                        </div>
+                                        <div onClick={() => handleNavigate(item)} className={`flex-1 p-4 rounded-2xl shadow-sm border transition-all active:scale-[0.98] cursor-pointer group relative overflow-hidden ${
+                                            isShopping 
+                                            ? 'bg-pink-50/50 border-pink-100 hover:border-pink-200' 
+                                            : 'bg-white border-stone-100 hover:border-stone-200 hover:shadow-md'
+                                        }`}>
+                                            <div className="absolute right-0 top-0 p-2 opacity-10 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="bg-orange-50 text-orange-600 p-1.5 rounded-full">
+                                                    <Navigation className="w-4 h-4" />
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-between items-start mb-1 pr-6">
+                                                <h3 className={`font-bold text-lg ${isShopping ? 'text-pink-800' : 'text-stone-800'}`}>{item.title}</h3>
+                                                {item.time && <span className="text-xs font-mono bg-stone-100 text-stone-500 px-2 py-1 rounded-md">{item.time}</span>}
+                                            </div>
+                                            {item.description && <p className={`text-sm leading-relaxed mb-2 ${isShopping ? 'text-pink-700/80' : 'text-stone-600'}`}>{item.description}</p>}
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                {item.note && <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-xs border border-amber-100"><Gift className="w-3 h-3" />{item.note}</div>}
+                                                {item.category === 'lodging' && <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs"><BedDouble className="w-3 h-3" />Hotel Info</div>}
+                                                {isShopping && <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-pink-100 text-pink-700 text-xs"><ShoppingBag className="w-3 h-3" />Shopping</div>}
+                                                <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-colors ${isShopping ? 'bg-white/60 text-pink-400' : 'bg-stone-50 text-stone-400 group-hover:bg-orange-50 group-hover:text-orange-600'}`}>
+                                                    <MapPin className="w-3 h-3" />{item.location || item.title}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            <div className="relative z-10 flex gap-4 opacity-50">
+                                <div className={`flex-shrink-0 w-10 h-4 mx-auto rounded-full ${currentTheme.line} mt-2`}></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- COMPONENT: INFO ---
+        const Info = ({ data }) => {
+            const [timeTW, setTimeTW] = useState('');
+            const [timeJP, setTimeJP] = useState('');
+            const [weather, setWeather] = useState({ temp: 0, feelsLike: 0, condition: 'Loading', location: '定位中...' });
+
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    const now = new Date();
+                    setTimeTW(now.toLocaleTimeString('zh-TW', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit' }));
+                    setTimeJP(now.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' }));
+                }, 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            useEffect(() => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            // Simulation based on location existence
+                            setWeather({ temp: -2, feelsLike: -6, condition: 'Snow', location: '目前位置 (北海道)' });
+                        },
+                        (error) => {
+                            setWeather({ temp: -3, feelsLike: -7, condition: 'Snow', location: '札幌 (預設)' });
+                        }
+                    );
+                } else {
+                    setWeather({ temp: -3, feelsLike: -7, condition: 'Snow', location: '札幌 (預設)' });
+                }
+            }, []);
+
+            const getWeatherIcon = (condition) => {
+                switch(condition) {
+                    case 'Sun': return <Sun className="w-8 h-8 text-amber-400" />;
+                    case 'Rain': return <CloudRain className="w-8 h-8 text-blue-400" />;
+                    case 'Snow': return <Snowflake className="w-8 h-8 text-cyan-300" />;
+                    default: return <Cloud className="w-8 h-8 text-stone-400" />;
+                }
+            };
+
+            return (
+                <div className="p-5 pb-24 space-y-6 bg-[#fffbf0]">
+                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-orange-100">
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="text-center p-3 bg-stone-50 rounded-xl">
+                                <div className="flex items-center justify-center gap-1 text-stone-400 text-xs mb-1"><Clock className="w-3 h-3" /> 台灣時間</div>
+                                <div className="text-2xl font-black text-stone-700">{timeTW}</div>
+                            </div>
+                            <div className="text-center p-3 bg-orange-50 rounded-xl border border-orange-100">
+                                <div className="flex items-center justify-center gap-1 text-orange-500 text-xs mb-1"><Clock className="w-3 h-3" /> 日本時間</div>
+                                <div className="text-2xl font-black text-orange-700">{timeJP}</div>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between bg-stone-800 text-white p-4 rounded-xl shadow-lg">
+                            <div>
+                                <div className="flex items-center gap-1 text-stone-300 text-xs mb-1"><MapPin className="w-3 h-3" /> {weather.location}</div>
+                                <div className="flex items-end gap-2">
+                                    <span className="text-4xl font-bold">{weather.temp}°</span>
+                                    <span className="text-sm text-stone-300 mb-1">體感 {weather.feelsLike}°</span>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                {getWeatherIcon(weather.condition)}
+                                <span className="text-xs mt-1 text-stone-300">{weather.condition === 'Snow' ? '下雪' : '多雲'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-orange-500 to-rose-500 rounded-2xl p-6 text-white shadow-lg shadow-orange-200">
+                        <h2 className="text-2xl font-bold mb-2">{data.title}</h2>
+                        <div className="flex items-center opacity-90 text-sm"><Ticket className="w-4 h-4 mr-2" /><span>團號: CTS05IT25D23K01</span></div>
+                        <div className="mt-4 pt-4 border-t border-white/20 flex justify-between items-center">
+                            <span className="text-orange-100 text-sm">日期</span>
+                            <span className="font-bold">{data.duration}</span>
+                        </div>
+                    </div>
+
+                    <section>
+                        <h3 className="text-lg font-bold text-stone-800 mb-3 flex items-center"><Phone className="w-5 h-5 mr-2 text-rose-500" /> 緊急聯絡</h3>
+                        <div className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-hidden">
+                            {data.contacts.map((contact, idx) => (
+                                <div key={idx} className="p-4 border-b border-orange-50 last:border-0">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="font-bold text-stone-700">{contact.role}</span>
+                                        <span className="bg-orange-50 text-orange-600 px-2 py-0.5 rounded text-xs">{contact.name}</span>
+                                    </div>
+                                    <div className="space-y-1 text-sm">
+                                        <div className="flex justify-between"><span className="text-stone-500">國內手機</span><a href={`tel:${contact.phoneTW}`} className="text-orange-600 font-mono">{contact.phoneTW}</a></div>
+                                        <div className="flex justify-between"><span className="text-stone-500">國外手機</span><a href={`tel:${contact.phoneJP}`} className="text-orange-600 font-mono">{contact.phoneJP}</a></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 className="text-lg font-bold text-stone-800 mb-3 flex items-center"><Plane className="w-5 h-5 mr-2 text-amber-500" /> 航班資訊</h3>
+                        <div className="space-y-3">
+                            {data.flights.map((flight, idx) => (
+                                <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-orange-100 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded-bl-lg font-bold">{idx === 0 ? '去程' : '回程'}</div>
+                                    <div className="flex justify-between items-end mb-3">
+                                        <span className="text-2xl font-black text-stone-700">{flight.from.split(' ')[0]}</span>
+                                        <Plane className="w-5 h-5 text-stone-300 mb-1 mx-2" />
+                                        <span className="text-2xl font-black text-stone-700">{flight.to.split(' ')[0]}</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div><p className="text-stone-400 text-xs">日期</p><p className="font-semibold text-stone-700">{flight.date}</p></div>
+                                        <div><p className="text-stone-400 text-xs">班機</p><p className="font-semibold text-stone-700">{flight.airline} {flight.flightNo}</p></div>
+                                        <div><p className="text-stone-400 text-xs">出發</p><p className="font-semibold text-stone-700">{flight.depTime}</p></div>
+                                        <div><p className="text-stone-400 text-xs">抵達</p><p className="font-semibold text-stone-700">{flight.arrTime}</p></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        // --- COMPONENT: SHOPPING LIST ---
+        const ShoppingList = () => {
+            const [items, setItems] = useState([]);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [newItemName, setNewItemName] = useState('');
+            const [newItemNote, setNewItemNote] = useState('');
+            const [newItemImage, setNewItemImage] = useState(null);
+            const fileInputRef = useRef(null);
+
+            const handleFileChange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => setNewItemImage(reader.result);
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const handleAddItem = (e) => {
+                e.preventDefault();
+                if (!newItemName.trim()) return;
+                const newItem = { id: Date.now().toString(), name: newItemName, imageUrl: newItemImage, note: newItemNote.trim(), isPurchased: false };
+                setItems([...items, newItem]);
+                setNewItemName(''); setNewItemNote(''); setNewItemImage(null); if (fileInputRef.current) fileInputRef.current.value = '';
+                setIsModalOpen(false);
+            };
+
+            const togglePurchased = (id) => setItems(items.map(item => item.id === id ? { ...item, isPurchased: !item.isPurchased } : item));
+            const deleteItem = (id) => { if (confirm('確定刪除？')) setItems(items.filter(item => item.id !== id)); };
+
+            return (
+                <div className="pb-32 pt-6 px-5 min-h-screen">
+                    <div className="flex items-center justify-between mb-6">
+                        <div><h2 className="text-2xl font-bold text-slate-800">購物清單</h2><p className="text-slate-500 text-sm mt-1">必買伴手禮與紀念品</p></div>
+                        <div className="bg-pink-100 p-2 rounded-full"><ShoppingBasket className="w-6 h-6 text-pink-600" /></div>
+                    </div>
+                    <div className="space-y-4">
+                        {items.length === 0 ? (
+                            <div className="text-center py-10 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200">
+                                <ShoppingBasket className="w-12 h-12 mx-auto mb-3 opacity-20" /><p>清單是空的，點擊右下角按鈕新增！</p>
+                            </div>
+                        ) : (
+                            items.map(item => (
+                                <div key={item.id} className={`bg-white rounded-2xl p-3 shadow-sm border transition-all duration-300 flex items-start gap-3 ${item.isPurchased ? 'border-green-200 bg-green-50/50 opacity-75' : 'border-slate-100'}`}>
+                                    <button onClick={() => togglePurchased(item.id)} className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${item.isPurchased ? 'bg-green-500 border-green-500 text-white' : 'border-slate-300 text-transparent hover:border-pink-300'}`}><Check className="w-3.5 h-3.5" strokeWidth={3} /></button>
+                                    <div className="flex-shrink-0 w-20 h-20 bg-slate-100 rounded-lg overflow-hidden border border-slate-100 relative group">
+                                        {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon className="w-8 h-8 opacity-50" /></div>}
+                                    </div>
+                                    <div className="flex-1 min-w-0 py-1">
+                                        <h3 className={`font-bold text-slate-800 text-lg leading-tight ${item.isPurchased ? 'line-through text-slate-400' : ''}`}>{item.name}</h3>
+                                        {item.note && <div className="text-sm text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100 mt-2 flex items-start gap-1.5"><StickyNote className="w-3.5 h-3.5 mt-0.5 text-slate-400 flex-shrink-0" /><span className="break-words">{item.note}</span></div>}
+                                    </div>
+                                    <button onClick={() => deleteItem(item.id)} className="p-2 text-slate-300 hover:text-red-400 mt-1"><Trash2 className="w-5 h-5" /></button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                    <button onClick={() => setIsModalOpen(true)} className="fixed bottom-24 right-6 w-14 h-14 bg-pink-500 hover:bg-pink-600 active:scale-95 text-white rounded-full shadow-xl shadow-pink-200 flex items-center justify-center z-40 group"><Plus className="w-8 h-8" /></button>
+                    {isModalOpen && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+                            <div className="bg-white rounded-2xl w-full max-w-sm relative z-10 shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+                                <h3 className="text-xl font-bold text-slate-800 mb-6">新增購物項目</h3>
+                                <form onSubmit={handleAddItem} className="space-y-4">
+                                    <input type="text" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} placeholder="商品名稱" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-pink-500" autoFocus />
+                                    <div onClick={() => fileInputRef.current.click()} className="w-full h-32 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-400 cursor-pointer bg-slate-50 relative overflow-hidden">
+                                        {newItemImage ? <img src={newItemImage} className="w-full h-full object-cover" /> : <><Upload className="w-8 h-8 mb-2" /><span className="text-xs">點擊上傳</span></>}
+                                        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                                    </div>
+                                    <textarea value={newItemNote} onChange={(e) => setNewItemNote(e.target.value)} placeholder="備註..." className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none resize-none h-24" />
+                                    <div className="pt-2 pb-2"><button type="submit" disabled={!newItemName.trim()} className="w-full bg-pink-500 text-white font-bold py-3.5 rounded-xl shadow-lg disabled:opacity-50">加入清單</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // --- COMPONENT: EXPENSES ---
+        const Expenses = () => {
+            const [items, setItems] = useState([]);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [exchangeRate, setExchangeRate] = useState(0.22);
+            const [isConverterOpen, setIsConverterOpen] = useState(false);
+            const [converterInput, setConverterInput] = useState('');
+            const [converterResult, setConverterResult] = useState('');
+            
+            // Form
+            const [category, setCategory] = useState('food');
+            const [name, setName] = useState('');
+            const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+            const [amount, setAmount] = useState('');
+            const [paymentMethod, setPaymentMethod] = useState('cash');
+            const [note, setNote] = useState('');
+
+            const totalAmountJPY = items.reduce((sum, item) => sum + item.amount, 0);
+            const totalAmountTWD = Math.round(totalAmountJPY * exchangeRate);
+
+            const getCategoryIcon = (cat) => {
+                switch (cat) {
+                    case 'transport': return <Bus className="w-5 h-5" />;
+                    case 'food': return <Utensils className="w-5 h-5" />;
+                    case 'lodging': return <BedDouble className="w-5 h-5" />;
+                    case 'ticket': return <Ticket className="w-5 h-5" />;
+                    case 'shopping': return <ShoppingBag className="w-5 h-5" />;
+                    default: return <MoreHorizontal className="w-5 h-5" />;
+                }
+            };
+
+            const getCategoryColor = (cat) => {
+                switch (cat) {
+                    case 'transport': return 'bg-blue-100 text-blue-600';
+                    case 'food': return 'bg-orange-100 text-orange-600';
+                    case 'lodging': return 'bg-amber-100 text-amber-600';
+                    case 'ticket': return 'bg-rose-100 text-rose-600';
+                    case 'shopping': return 'bg-pink-100 text-pink-600';
+                    default: return 'bg-stone-100 text-stone-600';
+                }
+            };
+
+            const handleAddExpense = (e) => {
+                e.preventDefault();
+                if (!name.trim() || !amount) return;
+                const newItem = { id: Date.now().toString(), category, name, date, amount: parseInt(amount), paymentMethod, note: note.trim() };
+                setItems([newItem, ...items]);
+                setCategory('food'); setName(''); setAmount(''); setNote(''); setIsModalOpen(false);
+            };
+
+            const handleConverterChange = (val) => {
+                setConverterInput(val);
+                if (val && !isNaN(parseFloat(val))) setConverterResult((parseFloat(val) * exchangeRate).toFixed(0));
+                else setConverterResult('');
+            };
+
+            const handleRateChange = (val) => {
+                const newRate = parseFloat(val);
+                const safeRate = isNaN(newRate) ? 0 : newRate;
+                setExchangeRate(safeRate);
+                if (converterInput && !isNaN(parseFloat(converterInput))) setConverterResult((parseFloat(converterInput) * safeRate).toFixed(0));
+            };
+
+            return (
+                <div className="pb-32 pt-6 px-5 min-h-screen bg-orange-50/30">
+                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-orange-100 mb-4 transition-all duration-300">
+                        <div className="flex justify-between items-center cursor-pointer select-none" onClick={() => setIsConverterOpen(!isConverterOpen)}>
+                            <div className="flex items-center gap-2 text-orange-700 font-bold"><RefreshCcw className="w-4 h-4" /><span className="text-sm">匯率換算</span></div>
+                            <div className="flex items-center gap-2">
+                                {!isConverterOpen && <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full">1 : {exchangeRate}</span>}
+                                <Calculator className={`w-4 h-4 text-orange-400 transition-transform duration-300 ${isConverterOpen ? 'rotate-180 text-orange-600' : ''}`} />
+                            </div>
+                        </div>
+                        {isConverterOpen && (
+                            <div className="mt-4 pt-4 border-t border-orange-100 animate-in slide-in-from-top-2 duration-200">
+                                <div className="flex items-center justify-between mb-4 bg-orange-50/50 p-2.5 rounded-xl border border-orange-100">
+                                    <div className="flex items-center gap-1.5 text-orange-800 text-xs font-medium"><Settings className="w-3.5 h-3.5" /><span>設定匯率</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-xs text-slate-400 font-mono">1 JPY =</span><input type="number" step="0.001" value={exchangeRate} onChange={(e) => handleRateChange(e.target.value)} className="w-20 px-2 py-1 text-sm text-center font-bold text-orange-700 bg-white border border-orange-200 rounded-lg outline-none" /><span className="text-xs text-slate-400 font-mono">TWD</span></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="flex-1 relative"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">¥</span><input type="number" value={converterInput} onChange={(e) => handleConverterChange(e.target.value)} placeholder="日幣" className="w-full pl-7 pr-3 py-2.5 bg-orange-50/50 border border-transparent rounded-xl text-sm outline-none" /></div>
+                                    <div className="text-orange-300 font-bold">=</div>
+                                    <div className="flex-1 relative"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">$</span><input type="text" readOnly value={converterResult} placeholder="台幣" className="w-full pl-7 pr-3 py-2.5 bg-slate-50 border border-transparent rounded-xl text-sm text-slate-700 font-bold outline-none" /></div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl p-6 text-white shadow-lg shadow-orange-200 mb-8 relative overflow-hidden">
+                        <div className="relative z-10">
+                            <p className="text-orange-100 text-sm font-medium mb-1">總花費 (日幣)</p>
+                            <div className="flex items-baseline gap-1"><span className="text-4xl font-black tracking-tight">¥{totalAmountJPY.toLocaleString()}</span></div>
+                            <div className="mt-1 text-orange-100/80 text-sm font-medium">≈ NT$ {totalAmountTWD.toLocaleString()} <span className="text-[10px] opacity-70 ml-1 font-normal">(匯率 {exchangeRate})</span></div>
+                        </div>
+                        <Wallet className="absolute -right-4 -bottom-4 w-32 h-32 text-white opacity-20 rotate-12" />
+                    </div>
+
+                    <div className="space-y-3">
+                        {items.length === 0 ? (
+                            <div className="text-center py-12 text-slate-400 bg-white rounded-2xl border border-dashed border-orange-200">
+                                <Wallet className="w-12 h-12 mx-auto mb-3 opacity-20 text-orange-400" /><p>目前沒有支出紀錄</p>
+                            </div>
+                        ) : (
+                            items.map(item => (
+                                <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 animate-in slide-in-from-bottom-2 duration-300">
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${getCategoryColor(item.category)}`}>{getCategoryIcon(item.category)}</div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start"><h3 className="font-bold text-slate-800 truncate pr-2">{item.name}</h3><span className="font-bold text-slate-800 whitespace-nowrap">¥{item.amount.toLocaleString()}</span></div>
+                                        <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                                            <span className="flex items-center gap-1 bg-slate-50 px-1.5 py-0.5 rounded"><Calendar className="w-3 h-3" />{item.date.slice(5).replace('-', '/')}</span>
+                                            <span className="flex items-center gap-1 bg-slate-50 px-1.5 py-0.5 rounded">{item.paymentMethod === 'cash' ? '現金' : '信用卡'}</span>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => { if(confirm('刪除？')) setItems(items.filter(i => i.id !== item.id)) }} className="p-2 text-slate-300 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    <button onClick={() => setIsModalOpen(true)} className="fixed bottom-24 right-6 w-14 h-14 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white rounded-full shadow-xl shadow-orange-200 flex items-center justify-center z-40 group"><Plus className="w-8 h-8" /></button>
+                    {isModalOpen && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+                            <div className="bg-white rounded-2xl w-full max-w-sm relative z-10 shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+                                <h3 className="text-xl font-bold text-slate-800 mb-6">新增支出</h3>
+                                <form onSubmit={handleAddExpense} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">類別</label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {['transport', 'food', 'lodging', 'ticket', 'shopping', 'other'].map(cat => (
+                                                <button key={cat} type="button" onClick={() => setCategory(cat)} className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${category === cat ? 'bg-orange-50 border-orange-500 text-orange-700' : 'bg-white border-slate-200 text-slate-500'}`}><div className="scale-75 mb-1">{getCategoryIcon(cat)}</div><span className="text-xs font-medium">{cat}</span></button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="col-span-2"><label className="block text-sm font-medium text-slate-700 mb-1">名稱</label><input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" required /></div>
+                                        <div><label className="block text-sm font-medium text-slate-700 mb-1">金額 (¥)</label><input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" required /></div>
+                                        <div><label className="block text-sm font-medium text-slate-700 mb-1">日期</label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" required /></div>
+                                    </div>
+                                    <div><label className="block text-sm font-medium text-slate-700 mb-2">付款</label><div className="flex bg-slate-100 p-1 rounded-xl"><button type="button" onClick={() => setPaymentMethod('cash')} className={`flex-1 py-2 rounded-lg text-sm font-medium ${paymentMethod === 'cash' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500'}`}>現金</button><button type="button" onClick={() => setPaymentMethod('credit')} className={`flex-1 py-2 rounded-lg text-sm font-medium ${paymentMethod === 'credit' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500'}`}>信用卡</button></div></div>
+                                    <div className="pt-2 pb-2"><button type="submit" className="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl shadow-lg">新增支出</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // --- COMPONENT: APP ---
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('itinerary');
+
+            return (
+                <div className="min-h-screen bg-[#fffbf0] max-w-md mx-auto relative shadow-2xl overflow-hidden h-screen overflow-y-auto overflow-x-hidden scroll-smooth flex flex-col font-sans">
+                    <div className="pt-10 pb-2 px-6 bg-[#fffbf0]">
+                        <span className="inline-block bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-full mb-2 tracking-wider uppercase border border-orange-200">2025 Winter Tour</span>
+                        <h1 className="text-3xl font-black text-stone-800 leading-tight">北海道<span className="text-orange-500 ml-2">五稜星雪祭 ❄️</span></h1>
+                    </div>
+
+                    <main className="flex-1 relative z-10 bg-[#fffbf0]">
+                        {activeTab === 'itinerary' && <Itinerary data={TRIP_DATA} />}
+                        {activeTab === 'info' && <Info data={TRIP_DATA} />}
+                        {activeTab === 'shopping' && <ShoppingList />}
+                        {activeTab === 'expenses' && <Expenses />}
+                    </main>
+
+                    <nav className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-sm bg-white/95 backdrop-blur-md rounded-full shadow-2xl border border-orange-100/50 z-50 p-1.5 flex justify-between items-center text-stone-500">
+                        <button onClick={() => setActiveTab('itinerary')} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-full transition-all duration-300 ${activeTab === 'itinerary' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'hover:bg-orange-50'}`}><CalendarDays className="w-5 h-5 mb-0.5" /><span className="text-[10px] font-medium">行程</span></button>
+                        <button onClick={() => setActiveTab('info')} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-full transition-all duration-300 ${activeTab === 'info' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'hover:bg-orange-50'}`}><InfoIcon className="w-5 h-5 mb-0.5" /><span className="text-[10px] font-medium">資訊</span></button>
+                        <button onClick={() => setActiveTab('shopping')} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-full transition-all duration-300 ${activeTab === 'shopping' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'hover:bg-orange-50'}`}><ShoppingBasket className="w-5 h-5 mb-0.5" /><span className="text-[10px] font-medium">購物</span></button>
+                        <button onClick={() => setActiveTab('expenses')} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-full transition-all duration-300 ${activeTab === 'expenses' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'hover:bg-orange-50'}`}><Wallet className="w-5 h-5 mb-0.5" /><span className="text-[10px] font-medium">花費</span></button>
+                    </nav>
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

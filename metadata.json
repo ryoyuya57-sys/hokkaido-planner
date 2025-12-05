@@ -1,0 +1,7 @@
+{
+  "name": "Hokkaido Winter Trip 2025",
+  "description": "A detailed itinerary app for the 5-day Hokkaido winter tour including Hakodate, Noboribetsu, and Sapporo.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
